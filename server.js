@@ -13,6 +13,7 @@ const rooms = {};
 const rid = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
 const newPin = () => { let p; do p = String(100000 + Math.floor(Math.random() * 900000)); while (rooms[p]); return p; };
 const players = r => Object.values(r.players);
+const same = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]);
 
 function ranked(r) { return players(r).sort((a, b) => b.score - a.score); }
 
@@ -20,15 +21,15 @@ function view(r, p) {
   const v = { phase: r.phase, pin: r.pin, n: players(r).length, names: players(r).map(x => x.name) };
   if (r.phase === 'question' || r.phase === 'results') {
     const q = r.questions[r.idx];
-    v.q = { idx: r.idx, total: r.questions.length, text: q.text, options: q.options, seconds: q.seconds,
+    v.q = { idx: r.idx, total: r.questions.length, text: q.text, options: q.options, seconds: q.seconds, multi: q.correct.length > 1,
             left: Math.max(0, r.endsAt - Date.now()) };
     v.answered = players(r).filter(x => x.ans).length;
   }
   if (r.phase === 'results') {
     const q = r.questions[r.idx];
     const counts = q.options.map(() => 0);
-    players(r).forEach(x => { if (x.ans) counts[x.ans.c]++; });
-    v.res = { counts, correct: q.correct, last: r.idx >= r.questions.length - 1 };
+    players(r).forEach(x => { if (x.ans) x.ans.c.forEach(i => counts[i]++); });
+    v.res = { counts, correct: q.correct, exact: players(r).filter(x => x.ans && same(x.ans.c, q.correct)).length, last: r.idx >= r.questions.length - 1 };
   }
   if (r.phase === 'results' || r.phase === 'end')
     v.board = ranked(r).slice(0, r.phase === 'end' ? 10 : 5).map(x => ({ name: x.name, score: x.score }));
@@ -61,7 +62,7 @@ function finish(r) {
   r.phase = 'results';
   players(r).forEach(p => {
     p.gain = 0;
-    if (p.ans && p.ans.c === q.correct) {
+    if (p.ans && same(p.ans.c, q.correct)) {
       p.gain = Math.round(500 + 500 * Math.max(0, 1 - p.ans.t / (q.seconds * 1000)));
       p.score += p.gain;
     }
@@ -76,6 +77,7 @@ io.on('connection', s => {
     if (process.env.LEHRER_PASSWORT && password !== process.env.LEHRER_PASSWORT)
       return cb({ error: 'Falsches Lehrer-Passwort.' });
     if (!Array.isArray(questions) || !questions.length) return cb({ error: 'Keine Fragen gefunden.' });
+    questions.forEach(q => { q.correct = [...new Set([].concat(q.correct))].sort((a, b) => a - b); });
     const r = { pin: newPin(), hostToken: rid(), hostSid: s.id, questions, idx: -1, phase: 'lobby', players: {}, created: Date.now() };
     rooms[r.pin] = r;
     cb({ pin: r.pin, token: r.hostToken, view: view(r) });
@@ -119,7 +121,9 @@ io.on('connection', s => {
       const p = players(r).find(x => x.sid === s.id);
       if (!p) continue;
       const q = r.questions[r.idx];
-      if (r.phase !== 'question' || p.ans || !q || !(c >= 0 && c < q.options.length)) return;
+      if (r.phase !== 'question' || p.ans || !q) return;
+      c = [...new Set([].concat(c))].filter(i => Number.isInteger(i) && i >= 0 && i < q.options.length).sort((a, b) => a - b);
+      if (!c.length) return;
       p.ans = { c, t: Date.now() - r.startedAt };
       s.emit('state', view(r, p));
       io.to(r.hostSid).emit('state', view(r));
