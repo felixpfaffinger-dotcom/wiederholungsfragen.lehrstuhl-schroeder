@@ -3,142 +3,144 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Klassenblitz – Live-Quiz für den Unterricht</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+<title>Wiederholungsfragen · Lehrstuhl Prof. Schröder</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>§</text></svg>">
 <style>
-:root{--ink:#10143a;--ink2:#4a4f78;--paper:#eef1fa;--card:#fff;--line:#d9ddef;--bolt:#ffd23f;--ok:#1f9d6b;--bad:#e5484d;--r:18px;
---c0:#e5484d;--c1:#3e63dd;--c2:#f0a000;--c3:#2a9d6f;--c4:#8e4ec6;--c5:#0f9ba8}
-@media (prefers-color-scheme:dark){:root{--ink:#eef0ff;--ink2:#a8add6;--paper:#0c0f2b;--card:#171b45;--line:#2b3070}}
+:root{--ink:#1b2438;--ink2:#575d6e;--paper:#f4f3ef;--card:#fff;--line:#cdcbc2;--acc:#6e1f2e;--ok:#2f6b4f;--bad:#a3322f;--bolt:#6e1f2e;
+--c0:#2b3f66;--c1:#6e1f2e;--c2:#8a6d1f;--c3:#2f6b4f;--c4:#5b4a73;--c5:#2d6770}
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%}
-body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--paper);color:var(--ink);line-height:1.45}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--paper);color:var(--ink);line-height:1.5}
 button,input,textarea{font:inherit;color:inherit}
-:focus-visible{outline:3px solid var(--c1);outline-offset:2px}
+:focus-visible{outline:3px solid var(--c0);outline-offset:2px}
 .wrap{max-width:980px;margin:0 auto;padding:20px 20px 60px}
-.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 0 18px}
-.logo{font-weight:900;font-size:22px;letter-spacing:-.5px;display:flex;align-items:center;gap:8px}
-.logo i{font-style:normal;background:var(--bolt);color:#10143a;width:32px;height:32px;border-radius:10px;display:grid;place-items:center;transform:rotate(-8deg)}
-.pill{background:var(--card);border:1px solid var(--line);border-radius:99px;padding:6px 14px;font-weight:700;font-size:14px}
-h1{font-size:clamp(34px,7vw,60px);line-height:1.02;letter-spacing:-1.5px;margin:.2em 0 .3em;font-weight:900}
-h2{font-size:clamp(24px,4.6vw,38px);line-height:1.15;letter-spacing:-.8px;margin:.2em 0 .6em;font-weight:800}
-h3{margin:0 0 10px;font-size:18px}
-p.lead{font-size:18px;color:var(--ink2);max-width:52ch}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:24px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0 14px;border-bottom:2px solid var(--ink);margin-bottom:26px}
+.logo{display:flex;align-items:center;gap:12px;font-family:Georgia,"Times New Roman",serif}
+.logo i{font-style:normal;font-size:34px;color:var(--acc);line-height:1}
+.logo b{display:block;font-size:20px;line-height:1.1}.logo small{display:block;font-size:14px;color:var(--ink2)}
+.pill{border:1px solid var(--line);background:var(--card);border-radius:3px;padding:5px 12px;font-weight:600;font-size:14px}
+h1,h2,h3,.qtext,.pin{font-family:Georgia,"Times New Roman",serif}
+h1{font-size:clamp(30px,6vw,46px);line-height:1.1;margin:.2em 0 .4em;font-weight:700}
+h2{font-size:clamp(22px,4vw,32px);margin:.2em 0 .6em}
+h3{margin:0 0 10px;font-size:19px}
+p.lead{font-size:17px;color:var(--ink2);max-width:60ch}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:22px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 @media(max-width:760px){.grid2{grid-template-columns:1fr}}
-label{display:block;font-weight:700;font-size:14px;margin:14px 0 6px}
-input[type=text],input[type=password],input[type=number],textarea{width:100%;background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:12px 14px}
-input:focus,textarea:focus{border-color:var(--c1);outline:none}
-textarea{min-height:170px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;resize:vertical}
-.btn{border:0;border-radius:14px;padding:14px 22px;font-weight:800;font-size:17px;cursor:pointer;background:var(--ink);color:var(--paper);transition:transform .08s}
-.btn:active{transform:scale(.97)}
-.btn.bolt{background:var(--bolt);color:#10143a}
-.btn.ghost{background:transparent;border:2px solid var(--line);color:var(--ink)}
-.btn.big{padding:18px 30px;font-size:20px}
+label{display:block;font-weight:600;font-size:14px;margin:12px 0 5px}
+input[type=text],input[type=password],input[type=number],textarea{width:100%;background:#fff;border:1px solid #9a988e;border-radius:3px;padding:10px 12px}
+input:focus,textarea:focus{border-color:var(--c0);outline:none;box-shadow:0 0 0 2px #2b3f6633}
+textarea{min-height:90px;resize:vertical}
+.btn{border:1px solid var(--ink);border-radius:3px;padding:11px 20px;font-weight:600;font-size:16px;cursor:pointer;background:var(--ink);color:#fff}
+.btn:active{transform:translateY(1px)}
+.btn.bolt{background:var(--acc);border-color:var(--acc)}
+.btn.ghost{background:#fff;color:var(--ink);border-color:#9a988e}
+.btn.big{padding:15px 28px;font-size:18px}.btn.sm{padding:6px 12px;font-size:14px}
 .btn[disabled]{opacity:.4;cursor:not-allowed}
-.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-.err{color:var(--bad);font-weight:700;margin-top:10px;min-height:1.2em}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.between{justify-content:space-between}
+.err{color:var(--bad);font-weight:600;margin-top:10px;min-height:1.2em}
 .hint{color:var(--ink2);font-size:14px}
-a{color:var(--c1)}
-.hidden{display:none!important}
-.center{text-align:center}
-/* Join */
-.join{max-width:420px;margin:6vh auto 0;text-align:center}
-.join input{text-align:center;font-size:28px;font-weight:800;letter-spacing:4px;margin-bottom:12px;padding:16px}
-.join input.name{letter-spacing:0;font-size:22px}
-/* Lobby */
-.pin{font-size:clamp(56px,14vw,120px);font-weight:900;letter-spacing:6px;line-height:1;background:var(--bolt);color:#10143a;display:inline-block;padding:.08em .22em;border-radius:22px;transform:rotate(-1.5deg)}
+a{color:var(--c0)}.hidden{display:none!important}.center{text-align:center}
+.join{max-width:420px;margin:5vh auto 0;text-align:center}
+.join input{text-align:center;font-size:26px;font-weight:700;letter-spacing:4px;margin-bottom:12px;padding:14px}
+.join input.name{letter-spacing:0;font-size:20px}
+.pin{font-size:clamp(56px,14vw,116px);font-weight:700;letter-spacing:8px;line-height:1;background:#fff;border:3px double var(--ink);display:inline-block;padding:.1em .25em}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;justify-content:center}
-.chip{background:var(--card);border:1px solid var(--line);border-radius:99px;padding:6px 14px;font-weight:700}
-/* Timer */
-.timer{height:12px;border-radius:99px;background:var(--line);overflow:hidden;margin:6px 0 22px}
-.timer b{display:block;height:100%;background:var(--c1);width:100%}
-.timer.low b{background:var(--bad)}
-.qmeta{display:flex;justify-content:space-between;align-items:center;font-weight:700;color:var(--ink2)}
-.clock{font-size:34px;font-weight:900;color:var(--ink);font-variant-numeric:tabular-nums}
-/* Options */
-.opts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.chip{background:#fff;border:1px solid var(--line);border-radius:3px;padding:5px 12px;font-weight:600}
+.timer{height:8px;background:var(--line);overflow:hidden;margin:6px 0 22px}
+.timer b{display:block;height:100%;background:var(--c0);width:100%}.timer.low b{background:var(--bad)}
+.qmeta{display:flex;justify-content:space-between;align-items:center;font-weight:600;color:var(--ink2)}
+.clock{font-size:32px;font-weight:700;color:var(--ink);font-family:Georgia,serif}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:620px){.opts{grid-template-columns:1fr}}
-.opt{display:flex;align-items:center;gap:14px;border:0;border-radius:var(--r);padding:20px;font-weight:800;font-size:clamp(17px,3.2vw,24px);color:#fff;text-align:left;cursor:pointer;min-height:84px}
-.opt .sym{font-size:26px;opacity:.9;width:30px;text-align:center}
-.opts.static .opt{cursor:default}
-.opt.dim{opacity:.35}
-.opt.sel{outline:5px solid var(--ink);outline-offset:3px}
-/* Stats */
-.bars{display:flex;align-items:flex-end;gap:16px;height:300px;padding:10px 0 0}
+.opt{display:flex;align-items:center;gap:14px;border:0;border-radius:3px;padding:18px;font-weight:600;font-size:clamp(17px,3vw,22px);color:#fff;text-align:left;cursor:pointer;min-height:76px}
+.opt .sym{font-family:Georgia,serif;font-size:24px;width:30px;text-align:center;border-right:1px solid #fff6;padding-right:12px;box-sizing:content-box}
+.opts.static .opt{cursor:default}.opt.dim{opacity:.35}
+.bars{display:flex;align-items:flex-end;gap:16px;height:290px;padding-top:10px}
 .bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;min-width:0}
-.bar .v{font-weight:900;font-size:22px;margin-bottom:6px}
-.bar .col{width:100%;border-radius:14px 14px 4px 4px;min-height:6px;transition:height .7s cubic-bezier(.2,.8,.2,1)}
-.bar .lab{margin-top:8px;font-weight:700;font-size:13px;text-align:center;overflow-wrap:anywhere;color:var(--ink2);max-height:3.6em;overflow:hidden}
-.bar.dim{opacity:.3}
-.bar.right .lab{color:var(--ok)}
+.bar .v{font-weight:700;font-size:21px;margin-bottom:6px}
+.bar .col{width:100%;border-radius:2px 2px 0 0;min-height:6px;transition:height .6s ease}
+.bar .lab{margin-top:8px;font-weight:600;font-size:13px;text-align:center;overflow-wrap:anywhere;color:var(--ink2);max-height:3.8em;overflow:hidden}
+.bar.dim{opacity:.35}.bar.right .lab{color:var(--ok)}
 .board{list-style:none;margin:0;padding:0}
-.board li{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-weight:700}
-.board li:first-child{font-size:20px}
+.board li{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-weight:600}
+.board li:first-child{font-size:19px}
 .board li span:first-child::before{content:attr(data-r);display:inline-block;width:28px;color:var(--ink2)}
-/* Player feedback */
-.fb{border-radius:24px;padding:34px 20px;text-align:center;color:#fff;margin-top:12px}
+.fb{border-radius:4px;padding:30px 20px;text-align:center;color:#fff;margin-top:12px}
 .fb.ok{background:var(--ok)}.fb.bad{background:var(--bad)}.fb.none{background:var(--ink2)}
-.fb .ico{font-size:64px;line-height:1}
-.fb .t{font-size:30px;font-weight:900}
+.fb .ico{font-size:56px;line-height:1}.fb .t{font-size:28px;font-weight:700;font-family:Georgia,serif}
 .wait{text-align:center;padding:60px 10px}
-.pulse{display:inline-block;font-size:56px;animation:p 1.2s ease-in-out infinite}
-@keyframes p{50%{transform:scale(1.18) rotate(-6deg)}}
-@media(prefers-reduced-motion:reduce){.pulse{animation:none}.bar .col{transition:none}}
-.qtext{font-size:clamp(24px,4.6vw,42px);font-weight:800;letter-spacing:-.8px;line-height:1.15;margin:4px 0 22px}
+.qtext{font-size:clamp(23px,4.2vw,38px);font-weight:700;line-height:1.2;margin:4px 0 22px}
+.item{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:16px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border:0}
+.qcard{border:1px solid var(--line);border-left:4px solid var(--acc);background:#fff;padding:16px;margin-bottom:14px;border-radius:3px}
+.orow{display:flex;align-items:center;gap:10px;margin-top:8px}.orow b{width:20px;font-family:Georgia,serif}
+.orow input[type=radio]{width:20px;height:20px;accent-color:var(--ok);flex:none}
+.sec{width:90px!important}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="top"><div class="logo"><i>⚡</i>Klassenblitz</div><div class="pill hidden" id="topinfo"></div></div>
+  <div class="top"><div class="logo"><i>§</i><div><b>Wiederholungsfragen</b><small>Lehrstuhl Prof. Schröder</small></div></div><div class="pill hidden" id="topinfo"></div></div>
 
   <!-- SCHÜLER: Beitreten -->
   <section id="v-join" class="join hidden">
-    <h1>Mach mit!</h1>
-    <p class="lead" style="margin:0 auto 22px">Gib die PIN von der Tafel ein und such dir einen Namen aus.</p>
+    <h1>Teilnehmen</h1>
+    <p class="lead" style="margin:0 auto 22px">Geben Sie die PIN von der Leinwand und einen Namen ein.</p>
     <input id="j-pin" type="text" inputmode="numeric" maxlength="6" placeholder="PIN" autocomplete="off" aria-label="PIN">
     <input id="j-name" class="name" type="text" maxlength="20" placeholder="Dein Name" autocomplete="off" aria-label="Dein Name">
     <button class="btn bolt big" id="j-go" style="width:100%">Beitreten</button>
     <div class="err" id="j-err"></div>
   </section>
 
-  <!-- LEHRER: Einrichtung -->
-  <section id="v-setup" class="hidden">
-    <h1>Quiz in 60 Sekunden starten.</h1>
-    <p class="lead">Lade deine Fragen als Tabelle hoch. Deine Klasse antwortet mit dem Handy, du siehst nach jeder Frage die Auswertung.</p>
-    <div class="grid2" style="margin-top:22px">
-      <div class="card">
-        <h3>1 · Fragen hochladen</h3>
-        <input type="file" id="s-file" accept=".csv,.txt,.json" class="hint">
-        <label for="s-text">oder hier einfügen</label>
-        <textarea id="s-text" spellcheck="false" placeholder="Frage;Sekunden;Richtig;Antwort A;Antwort B;Antwort C;Antwort D"></textarea>
-        <div class="hint" id="s-count" style="margin-top:8px"></div>
+  <!-- LEHRER: Übersicht -->
+  <section id="v-home" class="hidden">
+    <h1>Meine Quizze</h1>
+    <div class="card">
+      <div id="h-list"></div>
+      <div class="row" style="margin-top:16px">
+        <button class="btn bolt" id="h-new">Neues Quiz</button>
+        <button class="btn ghost" id="h-exp">Sichern (Datei)</button>
+        <button class="btn ghost" id="h-imp">Laden</button>
+        <input type="file" id="h-file" accept=".json" class="hidden">
       </div>
-      <div class="card">
-        <h3>2 · Einstellungen</h3>
-        <label for="s-time">Standard-Zeit pro Frage (Sekunden)</label>
-        <input type="number" id="s-time" value="20" min="5" max="300">
-        <p class="hint">Gilt für alle Fragen, bei denen in der Tabelle keine Zeit steht. Eine Zeit in der Tabelle hat Vorrang.</p>
-        <div id="s-pwbox" style="display:none">
-          <label for="s-pw">Lehrer-Passwort</label>
-          <input type="password" id="s-pw" autocomplete="current-password">
-        </div>
-        <div class="row" style="margin-top:20px">
-          <button class="btn bolt big" id="s-go">Quiz erstellen</button>
-        </div>
-        <div class="err" id="s-err"></div>
-        <p class="hint">Aufbau der Tabelle: <a href="/beispiel.csv" download>Beispieldatei herunterladen</a>. In Excel als „CSV (Trennzeichen-getrennt)“ speichern. Richtig = Buchstabe der richtigen Antwort (A, B, C …). Bis zu 6 Antworten.</p>
-      </div>
+      <div id="h-pwbox"><label for="h-pw">Lehrer-Passwort (zum Starten)</label><input type="password" id="h-pw" autocomplete="current-password" style="max-width:300px"></div>
+      <div class="err" id="h-err"></div>
+      <p class="hint">Die Quizze werden in diesem Browser gespeichert. Mit „Sichern“ erzeugen Sie eine Sicherungsdatei, die Sie auf einem anderen Gerät mit „Laden“ wieder einlesen.</p>
     </div>
+  </section>
+
+  <!-- LEHRER: Editor -->
+  <section id="v-edit" class="hidden">
+    <div class="row between"><h1 style="margin:0">Quiz bearbeiten</h1>
+      <div class="row"><button class="btn ghost" id="e-back">Zurück</button><button class="btn ghost" id="e-prev">Vorschau</button><button class="btn bolt" id="e-save">Speichern</button></div></div>
+    <div class="err" id="e-err"></div>
+    <div class="grid2" style="margin:14px 0">
+      <div><label for="e-title">Titel</label><input type="text" id="e-title" placeholder="z. B. BGB AT – Willenserklärung"></div>
+      <div><label for="e-time">Standard-Zeit pro Frage (Sekunden)</label><input type="number" id="e-time" min="5" max="300"></div>
+    </div>
+    <div id="e-qs"></div>
+    <div class="row"><button class="btn ghost" id="e-add">+ Frage hinzufügen</button>
+      <button class="btn ghost" id="e-csv">Fragen aus CSV importieren</button><input type="file" id="e-csvf" accept=".csv,.txt" class="hidden"></div>
+    <p class="hint">Richtige Antwort per Auswahlkreis markieren. Leere Antwortfelder werden ignoriert, mindestens zwei Antworten sind nötig.</p>
+  </section>
+
+  <!-- LEHRER: Vorschau -->
+  <section id="v-pre" class="hidden">
+    <div class="qmeta"><span id="p-no"></span><span class="pill" id="p-sec"></span></div>
+    <div class="qtext" id="p-text" style="margin-top:14px"></div>
+    <div class="opts static" id="p-opts"></div>
+    <p class="hint">Vorschau: So sehen die Teilnehmer die Frage. Die richtige Antwort ist hier zur Kontrolle markiert (✓).</p>
+    <div class="row"><button class="btn ghost" id="p-prev">Zurück</button><button class="btn ghost" id="p-next">Weiter</button><button class="btn" id="p-close">Vorschau schließen</button></div>
   </section>
 
   <!-- LEHRER: Lobby -->
   <section id="v-lobby" class="center hidden">
-    <p class="lead" style="margin:0 auto">Öffne <b id="l-url"></b> und gib diese PIN ein:</p>
+    <p class="lead" style="margin:0 auto">Öffnen Sie <b id="l-url"></b> und geben Sie diese PIN ein:</p>
     <div class="pin" id="l-pin"></div>
     <div class="chips" id="l-names"></div>
     <p class="hint" id="l-n" style="margin-top:14px"></p>
-    <button class="btn bolt big" id="l-go" style="margin-top:12px">Los geht’s</button>
+    <button class="btn bolt big" id="l-go" style="margin-top:12px">Quiz starten</button>
   </section>
 
   <!-- Frage (Lehrer + Schüler) -->
@@ -151,7 +153,7 @@ a{color:var(--c1)}
       <span class="pill" id="q-ans"></span>
       <button class="btn ghost" id="q-end">Frage jetzt beenden</button>
     </div>
-    <div class="wait hidden" id="q-wait"><span class="pulse">⚡</span><h2>Antwort gespeichert</h2><p class="hint">Warte, bis alle fertig sind …</p></div>
+    <div class="wait hidden" id="q-wait"><h2>Antwort gespeichert</h2><p class="hint">Bitte warten, bis alle fertig sind …</p></div>
   </section>
 
   <!-- Auswertung -->
@@ -172,23 +174,23 @@ a{color:var(--c1)}
 
   <!-- Ende -->
   <section id="v-end" class="hidden">
-    <h1>Geschafft! 🏁</h1>
+    <h1>Ergebnis</h1>
     <div id="e-me" class="hidden"></div>
     <div class="card"><h3>Endergebnis</h3><ol class="board" id="e-board"></ol></div>
-    <div class="row" style="margin-top:18px"><button class="btn ghost" id="e-new">Neues Quiz</button></div>
+    <div class="row" style="margin-top:18px"><button class="btn ghost" id="e-new">Zurück zur Übersicht</button></div>
   </section>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
 const $=id=>document.getElementById(id);
-const SYM=['▲','◆','●','■','★','⬢'], LET='ABCDEF';
+const LET='ABCDEF';
 const IS_HOST=location.pathname.replace(/\/$/,'')==='/host';
 const S=io(), store=k=>localStorage.getItem(k), put=(k,v)=>localStorage.setItem(k,v);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let tick=null, cur=null, parsed=[];
 
-function show(id){['v-join','v-setup','v-lobby','v-q','v-res','v-end'].forEach(v=>$(v).classList.toggle('hidden',v!==id))}
+function show(id){['v-join','v-home','v-edit','v-pre','v-lobby','v-q','v-res','v-end'].forEach(v=>$(v).classList.toggle('hidden',v!==id))}
 function setTopInfo(txt){const t=$('topinfo');t.classList.toggle('hidden',!txt);t.textContent=txt||''}
 
 /* ---------- CSV ---------- */
@@ -205,24 +207,57 @@ function parseQuestions(raw,defT){
   }
   return out;
 }
-function reparse(){
-  parsed=parseQuestions($('s-text').value,+$('s-time').value||20);
-  $('s-count').textContent=$('s-text').value.trim()?(parsed.length?`✓ ${parsed.length} Fragen erkannt`:'Keine gültigen Fragen erkannt. Prüfe das Format.'):'';
-}
-
 /* ---------- Lehrer ---------- */
+const KEY='wf-quizzes';let Q=[];try{Q=JSON.parse(localStorage.getItem(KEY))||[]}catch(e){}
+const saveQ=()=>put(KEY,JSON.stringify(Q)), uid=()=>Math.random().toString(36).slice(2);
+const blank=()=>({text:'',seconds:'',options:['','','',''],correct:0});
+let ed=null,edI=-1,pv=null;
+function cleanQ(q,def){const ix=[];q.options.forEach((o,k)=>{if(o.trim())ix.push(k)});const c=ix.indexOf(q.correct);
+  if(!q.text.trim()||ix.length<2||c<0)return null;
+  return{text:q.text.trim(),seconds:Math.min(300,Math.max(5,parseInt(q.seconds)||def)),options:ix.map(k=>q.options[k].trim()),correct:c}}
+function ready(z){const l=[];for(let i=0;i<z.qs.length;i++){const c=cleanQ(z.qs[i],z.time||20);if(!c)return{error:`Frage ${i+1} ist unvollständig (Fragetext, mindestens zwei Antworten und eine richtige Antwort nötig).`};l.push(c)}
+  return l.length?{list:l}:{error:'Das Quiz enthält keine Fragen.'}}
+function home(){show('v-home');setTopInfo('');$('h-err').textContent='';
+  $('h-list').innerHTML=Q.length?Q.map((z,i)=>`<div class="item"><div><b style="font-family:Georgia,serif;font-size:18px">${esc(z.title||'Ohne Titel')}</b><div class="hint">${z.qs.length} Fragen</div></div><div class="row" data-i="${i}"><button class="btn ghost sm" data-a="edit">Bearbeiten</button><button class="btn ghost sm" data-a="prev">Vorschau</button><button class="btn ghost sm" data-a="del">Löschen</button><button class="btn bolt sm" data-a="start">Freischalten</button></div></div>`).join(''):'<p class="hint">Noch kein Quiz vorhanden. Legen Sie mit „Neues Quiz“ das erste an.</p>'}
+function drawEd(){$('e-title').value=ed.title;$('e-time').value=ed.time;
+  $('e-qs').innerHTML=ed.qs.map((q,i)=>`<div class="qcard" data-q="${i}"><div class="row between"><b style="font-family:Georgia,serif">Frage ${i+1}</b><button class="btn ghost sm" data-a="delq">Entfernen</button></div><label>Fragetext</label><textarea class="qt">${esc(q.text)}</textarea>${q.options.map((o,k)=>`<div class="orow"><input type="radio" name="r${i}" data-k="${k}" ${q.correct===k?'checked':''} aria-label="Richtig: ${LET[k]}"><b>${LET[k]}</b><input type="text" class="ot" data-k="${k}" value="${esc(o)}" placeholder="Antwort ${LET[k]}"></div>`).join('')}<div class="row" style="margin-top:10px">${q.options.length<6?'<button class="btn ghost sm" data-a="addo">+ Antwort</button>':''}<label style="margin:0">Zeit (Sek.)</label><input type="number" class="sec" value="${esc(q.seconds)}" placeholder="Std." min="5" max="300"></div></div>`).join('')}
+function openEd(i){edI=i;ed=i<0?{id:uid(),title:'',time:20,qs:[blank()]}:JSON.parse(JSON.stringify(Q[i]));$('e-err').textContent='';drawEd();show('v-edit');scrollTo(0,0)}
+function grab(){ed.title=$('e-title').value.trim();ed.time=Math.min(300,Math.max(5,parseInt($('e-time').value)||20))}
+function saveEd(){grab();if(!ed.title)ed.title='Ohne Titel';if(edI<0){Q.push(ed);edI=Q.length-1}else Q[edI]=ed;saveQ()}
+function drawPre(){const c=pv.list[pv.i];$('p-no').textContent=`Frage ${pv.i+1} von ${pv.list.length}`;$('p-sec').textContent=`${c.seconds} Sekunden`;$('p-text').textContent=c.text;
+  $('p-opts').innerHTML=c.options.map((o,i)=>`<div class="opt" style="background:var(--c${i})"><span class="sym">${LET[i]}</span><span>${esc(o)}${i===c.correct?' ✓':''}</span></div>`).join('');
+  $('p-prev').disabled=pv.i===0;$('p-next').disabled=pv.i===pv.list.length-1}
+function preview(z,back){const r=ready(z);if(r.error){(back==='home'?$('h-err'):$('e-err')).textContent=r.error;return}
+  pv={list:r.list,i:0,back};drawPre();show('v-pre');scrollTo(0,0)}
 function hostInit(){
-  show('v-setup'); $('s-pwbox').style.display='block';
-  $('s-file').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
-    r.onload=()=>{let t=r.result;
-      if(f.name.endsWith('.json')){try{const j=JSON.parse(t);t=j.map(q=>[q.frage||q.text,q.sekunden||'',LET[q.richtig??0],...(q.antworten||q.options)].join(';')).join('\n')}catch(e){}}
-      $('s-text').value=t;reparse()};r.readAsText(f,'utf-8')};
-  $('s-text').oninput=reparse; $('s-time').oninput=reparse;
-  $('s-go').onclick=()=>{reparse();
-    if(!parsed.length){$('s-err').textContent='Lade zuerst Fragen hoch oder füge sie ein.';return}
-    S.emit('host:create',{questions:parsed,password:$('s-pw').value},res=>{
-      if(res.error){$('s-err').textContent=res.error;return}
-      put('kb-host',JSON.stringify({pin:res.pin,token:res.token}));render(res.view)})};
+  home();$('h-pw').value=sessionStorage.getItem('kb-pw')||'';
+  $('h-new').onclick=()=>openEd(-1);
+  $('h-list').onclick=e=>{const b=e.target.closest('button');if(!b)return;const i=+b.parentNode.dataset.i,z=Q[i],a=b.dataset.a;
+    if(a==='edit')openEd(i);else if(a==='prev')preview(z,'home');
+    else if(a==='del'){if(confirm(`„${z.title}“ wirklich löschen?`)){Q.splice(i,1);saveQ();home()}}
+    else if(a==='start'){const r=ready(z);if(r.error){$('h-err').textContent=r.error;return}
+      sessionStorage.setItem('kb-pw',$('h-pw').value);
+      S.emit('host:create',{questions:r.list,password:$('h-pw').value},res=>{if(res.error){$('h-err').textContent=res.error;return}
+        put('kb-host',JSON.stringify({pin:res.pin,token:res.token}));render(res.view)})}};
+  $('h-exp').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(Q,null,1)],{type:'application/json'}));a.download='wiederholungsfragen-sicherung.json';a.click()};
+  $('h-imp').onclick=()=>$('h-file').click();
+  $('h-file').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result);j.forEach(z=>{if(z&&z.qs){z.id=uid();Q.push(z)}});saveQ();home()}catch(x){$('h-err').textContent='Die Datei konnte nicht gelesen werden.'}};r.readAsText(f)};
+  $('e-add').onclick=()=>{grab();ed.qs.push(blank());drawEd();scrollTo(0,document.body.scrollHeight)};
+  $('e-save').onclick=()=>{saveEd();home()};
+  $('e-back').onclick=()=>{if(confirm('Ungespeicherte Änderungen gehen verloren. Zurück zur Übersicht?'))home()};
+  $('e-prev').onclick=()=>{grab();preview(ed,'edit')};
+  $('e-qs').oninput=e=>{const c=e.target.closest('.qcard');if(!c)return;const q=ed.qs[+c.dataset.q],t=e.target;
+    if(t.classList.contains('qt'))q.text=t.value;else if(t.classList.contains('ot'))q.options[+t.dataset.k]=t.value;else if(t.classList.contains('sec'))q.seconds=t.value};
+  $('e-qs').onchange=e=>{const c=e.target.closest('.qcard');if(c&&e.target.type==='radio')ed.qs[+c.dataset.q].correct=+e.target.dataset.k};
+  $('e-qs').onclick=e=>{const b=e.target.closest('button');if(!b)return;grab();const i=+b.closest('.qcard').dataset.q;
+    if(b.dataset.a==='delq'){ed.qs.splice(i,1);if(!ed.qs.length)ed.qs.push(blank())}else if(b.dataset.a==='addo')ed.qs[i].options.push('');drawEd()};
+  $('e-csv').onclick=()=>$('e-csvf').click();
+  $('e-csvf').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{grab();
+    const l=parseQuestions(r.result,ed.time);if(ed.qs.length===1&&!ed.qs[0].text.trim())ed.qs=[];
+    l.forEach(q=>ed.qs.push({text:q.text,seconds:q.seconds,options:q.options,correct:q.correct}));if(!ed.qs.length)ed.qs.push(blank());drawEd();
+    $('e-err').textContent=l.length?'':'In der Datei wurden keine gültigen Fragen erkannt.'};r.readAsText(f,'utf-8');e.target.value=''};
+  $('p-prev').onclick=()=>{pv.i--;drawPre()};$('p-next').onclick=()=>{pv.i++;drawPre()};
+  $('p-close').onclick=()=>pv.back==='home'?home():show('v-edit');
   $('l-go').onclick=()=>S.emit('host:next');
   $('q-end').onclick=()=>S.emit('host:end');
   $('r-next').onclick=()=>S.emit('host:next');
@@ -244,7 +279,7 @@ function playerInit(){
   $('j-go').onclick=go;
   [$('j-pin'),$('j-name')].forEach(i=>i.onkeydown=e=>{if(e.key==='Enter')go()});
   $('e-new').onclick=()=>location.reload();
-  $('e-new').textContent='Nochmal beitreten';
+  $('e-new').textContent='Erneut beitreten';
 }
 
 S.on('connect',()=>{
@@ -277,7 +312,7 @@ function render(v){
       $('l-go').disabled=!v.n}
     else{show('v-q');$('q-no').textContent='';$('q-clock').textContent='';$('q-timer').classList.add('hidden');
       $('q-text').textContent='';$('q-opts').innerHTML='';$('q-host').classList.add('hidden');
-      $('q-wait').classList.remove('hidden');$('q-wait').innerHTML=`<span class="pulse">⚡</span><h2>Du bist dabei, ${esc(v.me.name)}!</h2><p class="hint">Gleich geht’s los. Schau auf die Tafel.</p>`}
+      $('q-wait').classList.remove('hidden');$('q-wait').innerHTML=`<h2>Sie sind dabei, ${esc(v.me.name)}.</h2><p class="hint">Gleich geht es los.</p>`}
   }
   else if(v.phase==='question'){
     show('v-q');$('q-timer').classList.remove('hidden');
@@ -287,10 +322,10 @@ function render(v){
     if(IS_HOST)$('q-ans').textContent=`${v.answered} von ${v.n} haben geantwortet`;
     const answered=!IS_HOST&&v.me.chosen!==null;
     $('q-wait').classList.toggle('hidden',!answered);
-    if(answered)$('q-wait').innerHTML='<span class="pulse">⚡</span><h2>Antwort gespeichert</h2><p class="hint">Warte, bis alle fertig sind …</p>';
-    if(!sameQ){
+    if(answered)$('q-wait').innerHTML='<h2>Antwort gespeichert</h2><p class="hint">Bitte warten, bis alle fertig sind …</p>';
+    if(!sameQ||IS_HOST&&false){
       $('q-opts').className='opts'+(IS_HOST?' static':'');
-      $('q-opts').innerHTML=v.q.options.map((o,i)=>`<button class="opt" data-i="${i}" style="background:var(--c${i})"><span class="sym">${SYM[i]}</span><span>${esc(o)}</span></button>`).join('');
+      $('q-opts').innerHTML=v.q.options.map((o,i)=>`<button class="opt" data-i="${i}" style="background:var(--c${i})"><span class="sym">${LET[i]}</span><span>${esc(o)}</span></button>`).join('');
       if(!IS_HOST)$('q-opts').querySelectorAll('.opt').forEach(b=>b.onclick=()=>S.emit('player:answer',+b.dataset.i));
       startClock(v.q);
     }
@@ -301,7 +336,7 @@ function render(v){
     $('r-no').textContent=`Frage ${v.q.idx+1} von ${v.q.total}`;$('r-text').textContent=v.q.text;
     const tot=r.counts.reduce((a,b)=>a+b,0);
     const max=Math.max(1,...r.counts);
-    $('r-bars').innerHTML=r.counts.map((c,i)=>`<div class="bar ${i===r.correct?'right':'dim'}"><div class="v">${c}${tot?` <small style="font-size:13px;color:var(--ink2)">(${Math.round(c/tot*100)}%)</small>`:''}</div><div class="col" data-h="${c/max*100}" style="height:0;background:var(--c${i})"></div><div class="lab">${SYM[i]} ${esc(v.q.options[i])}${i===r.correct?' ✓':''}</div></div>`).join('');
+    $('r-bars').innerHTML=r.counts.map((c,i)=>`<div class="bar ${i===r.correct?'right':'dim'}"><div class="v">${c}${tot?` <small style="font-size:13px;color:var(--ink2)">(${Math.round(c/tot*100)}%)</small>`:''}</div><div class="col" data-h="${c/max*100}" style="height:0;background:var(--c${i})"></div><div class="lab">${LET[i]} ${esc(v.q.options[i])}${i===r.correct?' ✓':''}</div></div>`).join('');
     requestAnimationFrame(()=>requestAnimationFrame(()=>document.querySelectorAll('#r-bars .col').forEach(c=>c.style.height=Math.max(2,c.dataset.h)+'%')));
     $('r-board').innerHTML=v.board.map((b,i)=>`<li><span data-r="${i+1}.">${esc(b.name)}</span><span>${b.score}</span></li>`).join('');
     const right=r.counts[r.correct];
@@ -312,13 +347,14 @@ function render(v){
     if(!IS_HOST){const m=v.me,ok=m.chosen===r.correct;
       me.innerHTML=`<div class="fb ${m.chosen===null?'none':ok?'ok':'bad'}"><div class="ico">${m.chosen===null?'⏱':ok?'✓':'✗'}</div><div class="t">${m.chosen===null?'Zeit abgelaufen':ok?'Richtig!':'Leider falsch'}</div><div>${ok?`+${m.gain} Punkte · `:''}Platz ${m.rank} von ${m.of} · ${m.score} Punkte</div></div>`;
       $('r-stats').classList.add('hidden');
-      $('r-pl').classList.remove('hidden');$('r-pl').innerHTML=`<p class="hint center" style="margin-top:20px">Die Auswertung siehst du an der Tafel. Gleich geht’s weiter.</p>`}
+      $('r-pl').classList.remove('hidden');$('r-pl').innerHTML=`<p class="hint center" style="margin-top:20px">Die Auswertung sehen Sie auf der Leinwand.</p>`}
   }
   else if(v.phase==='end'){
     show('v-end');
     $('e-board').innerHTML=v.board.map((b,i)=>`<li><span data-r="${i+1}.">${esc(b.name)}</span><span>${b.score}</span></li>`).join('');
     const me=$('e-me');me.classList.toggle('hidden',IS_HOST);
     if(!IS_HOST)me.innerHTML=`<div class="fb ok" style="margin-bottom:18px"><div class="t">Platz ${v.me.rank} von ${v.me.of}</div><div>${v.me.score} Punkte</div></div>`;
+    $('e-new').classList.toggle('hidden',!IS_HOST&&false);
   }
   if(v.phase!=='results'&&!IS_HOST){$('r-stats').classList.remove('hidden');$('r-pl').classList.add('hidden')}
 }
