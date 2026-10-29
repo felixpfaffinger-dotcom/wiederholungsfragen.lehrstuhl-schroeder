@@ -55,6 +55,7 @@ a{color:var(--c0)}.hidden{display:none!important}.center{text-align:center}
 @media(max-width:620px){.opts{grid-template-columns:1fr}}
 .opt{display:flex;align-items:center;gap:14px;border:0;border-radius:3px;padding:18px;font-weight:600;font-size:clamp(17px,3vw,22px);color:#fff;text-align:left;cursor:pointer;min-height:76px}
 .opt .sym{font-family:Georgia,serif;font-size:24px;width:30px;text-align:center;border-right:1px solid #fff6;padding-right:12px;box-sizing:content-box}
+.opt.sel{outline:4px solid var(--ink);outline-offset:3px}
 .opts.static .opt{cursor:default}.opt.dim{opacity:.35}
 .bars{display:flex;align-items:flex-end;gap:16px;height:290px;padding-top:10px}
 .bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;min-width:0}
@@ -122,7 +123,7 @@ a{color:var(--c0)}.hidden{display:none!important}.center{text-align:center}
     <div id="e-qs"></div>
     <div class="row"><button class="btn ghost" id="e-add">+ Frage hinzufügen</button>
       <button class="btn ghost" id="e-csv">Fragen aus CSV importieren</button><input type="file" id="e-csvf" accept=".csv,.txt" class="hidden"></div>
-    <p class="hint">Richtige Antwort per Auswahlkreis markieren. Leere Antwortfelder werden ignoriert, mindestens zwei Antworten sind nötig.</p>
+    <p class="hint">Richtige Antworten per Häkchen markieren (auch mehrere möglich; gewertet wird nur, wenn genau die richtigen Antworten gewählt wurden). Leere Antwortfelder werden ignoriert, mindestens zwei Antworten sind nötig.</p>
   </section>
 
   <!-- LEHRER: Vorschau -->
@@ -149,6 +150,7 @@ a{color:var(--c0)}.hidden{display:none!important}.center{text-align:center}
     <div class="timer" id="q-timer"><b></b></div>
     <div class="qtext" id="q-text"></div>
     <div class="opts" id="q-opts"></div>
+    <button class="btn bolt big hidden" id="q-send" style="width:100%;margin-top:14px">Antwort abschicken</button>
     <div class="row" id="q-host" style="margin-top:22px;justify-content:space-between">
       <span class="pill" id="q-ans"></span>
       <button class="btn ghost" id="q-end">Frage jetzt beenden</button>
@@ -188,7 +190,7 @@ const LET='ABCDEF';
 const IS_HOST=location.pathname.replace(/\/$/,'')==='/host';
 const S=io(), store=k=>localStorage.getItem(k), put=(k,v)=>localStorage.setItem(k,v);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-let tick=null, cur=null, parsed=[];
+let tick=null, cur=null, parsed=[], sel=new Set();
 
 function show(id){['v-join','v-home','v-edit','v-pre','v-lobby','v-q','v-res','v-end'].forEach(v=>$(v).classList.toggle('hidden',v!==id))}
 function setTopInfo(txt){const t=$('topinfo');t.classList.toggle('hidden',!txt);t.textContent=txt||''}
@@ -201,31 +203,32 @@ function parseQuestions(raw,defT){
     const c=line.split(sep).map(x=>x.trim().replace(/^"|"$/g,''));
     if(/^frage$/i.test(c[0]))continue;
     const opts=c.slice(3).filter(x=>x!=='');
-    let k=LET.indexOf((c[2]||'').toUpperCase()); if(k<0&&/^[1-6]$/.test(c[2]))k=+c[2]-1;
-    if(!c[0]||opts.length<2||k<0||k>=opts.length)continue;
-    out.push({text:c[0],seconds:Math.min(300,Math.max(5,parseInt(c[1])||defT)),options:opts.slice(0,6),correct:k});
+    const ks=[...new Set((c[2]||'').toUpperCase().match(/[A-F1-6]/g)||[])].map(x=>isNaN(x)?LET.indexOf(x):+x-1).sort();
+    if(!c[0]||opts.length<2||!ks.length||ks.some(k=>k>=opts.length))continue;
+    out.push({text:c[0],seconds:Math.min(300,Math.max(5,parseInt(c[1])||defT)),options:opts.slice(0,6),correct:ks});
   }
   return out;
 }
 /* ---------- Lehrer ---------- */
 const KEY='wf-quizzes';let Q=[];try{Q=JSON.parse(localStorage.getItem(KEY))||[]}catch(e){}
 const saveQ=()=>put(KEY,JSON.stringify(Q)), uid=()=>Math.random().toString(36).slice(2);
-const blank=()=>({text:'',seconds:'',options:['','','',''],correct:0});
+const blank=()=>({text:'',seconds:'',options:['','','',''],correct:[0]});
 let ed=null,edI=-1,pv=null;
-function cleanQ(q,def){const ix=[];q.options.forEach((o,k)=>{if(o.trim())ix.push(k)});const c=ix.indexOf(q.correct);
-  if(!q.text.trim()||ix.length<2||c<0)return null;
+function cleanQ(q,def){const ix=[];q.options.forEach((o,k)=>{if(o.trim())ix.push(k)});const c=[].concat(q.correct).map(k=>ix.indexOf(k)).filter(k=>k>=0).sort();
+  if(!q.text.trim()||ix.length<2||!c.length)return null;
   return{text:q.text.trim(),seconds:Math.min(300,Math.max(5,parseInt(q.seconds)||def)),options:ix.map(k=>q.options[k].trim()),correct:c}}
 function ready(z){const l=[];for(let i=0;i<z.qs.length;i++){const c=cleanQ(z.qs[i],z.time||20);if(!c)return{error:`Frage ${i+1} ist unvollständig (Fragetext, mindestens zwei Antworten und eine richtige Antwort nötig).`};l.push(c)}
   return l.length?{list:l}:{error:'Das Quiz enthält keine Fragen.'}}
 function home(){show('v-home');setTopInfo('');$('h-err').textContent='';
   $('h-list').innerHTML=Q.length?Q.map((z,i)=>`<div class="item"><div><b style="font-family:Georgia,serif;font-size:18px">${esc(z.title||'Ohne Titel')}</b><div class="hint">${z.qs.length} Fragen</div></div><div class="row" data-i="${i}"><button class="btn ghost sm" data-a="edit">Bearbeiten</button><button class="btn ghost sm" data-a="prev">Vorschau</button><button class="btn ghost sm" data-a="del">Löschen</button><button class="btn bolt sm" data-a="start">Freischalten</button></div></div>`).join(''):'<p class="hint">Noch kein Quiz vorhanden. Legen Sie mit „Neues Quiz“ das erste an.</p>'}
 function drawEd(){$('e-title').value=ed.title;$('e-time').value=ed.time;
-  $('e-qs').innerHTML=ed.qs.map((q,i)=>`<div class="qcard" data-q="${i}"><div class="row between"><b style="font-family:Georgia,serif">Frage ${i+1}</b><button class="btn ghost sm" data-a="delq">Entfernen</button></div><label>Fragetext</label><textarea class="qt">${esc(q.text)}</textarea>${q.options.map((o,k)=>`<div class="orow"><input type="radio" name="r${i}" data-k="${k}" ${q.correct===k?'checked':''} aria-label="Richtig: ${LET[k]}"><b>${LET[k]}</b><input type="text" class="ot" data-k="${k}" value="${esc(o)}" placeholder="Antwort ${LET[k]}"></div>`).join('')}<div class="row" style="margin-top:10px">${q.options.length<6?'<button class="btn ghost sm" data-a="addo">+ Antwort</button>':''}<label style="margin:0">Zeit (Sek.)</label><input type="number" class="sec" value="${esc(q.seconds)}" placeholder="Std." min="5" max="300"></div></div>`).join('')}
+  $('e-qs').innerHTML=ed.qs.map((q,i)=>`<div class="qcard" data-q="${i}"><div class="row between"><b style="font-family:Georgia,serif">Frage ${i+1}</b><button class="btn ghost sm" data-a="delq">Entfernen</button></div><label>Fragetext</label><textarea class="qt">${esc(q.text)}</textarea>${q.options.map((o,k)=>`<div class="orow"><input type="checkbox" data-k="${k}" ${[].concat(q.correct).includes(k)?'checked':''} aria-label="Richtig: ${LET[k]}"><b>${LET[k]}</b><input type="text" class="ot" data-k="${k}" value="${esc(o)}" placeholder="Antwort ${LET[k]}"></div>`).join('')}<div class="row" style="margin-top:10px">${q.options.length<6?'<button class="btn ghost sm" data-a="addo">+ Antwort</button>':''}<label style="margin:0">Zeit (Sek.)</label><input type="number" class="sec" value="${esc(q.seconds)}" placeholder="Std." min="5" max="300"></div></div>`).join('')}
 function openEd(i){edI=i;ed=i<0?{id:uid(),title:'',time:20,qs:[blank()]}:JSON.parse(JSON.stringify(Q[i]));$('e-err').textContent='';drawEd();show('v-edit');scrollTo(0,0)}
 function grab(){ed.title=$('e-title').value.trim();ed.time=Math.min(300,Math.max(5,parseInt($('e-time').value)||20))}
 function saveEd(){grab();if(!ed.title)ed.title='Ohne Titel';if(edI<0){Q.push(ed);edI=Q.length-1}else Q[edI]=ed;saveQ()}
 function drawPre(){const c=pv.list[pv.i];$('p-no').textContent=`Frage ${pv.i+1} von ${pv.list.length}`;$('p-sec').textContent=`${c.seconds} Sekunden`;$('p-text').textContent=c.text;
-  $('p-opts').innerHTML=c.options.map((o,i)=>`<div class="opt" style="background:var(--c${i})"><span class="sym">${LET[i]}</span><span>${esc(o)}${i===c.correct?' ✓':''}</span></div>`).join('');
+  $('p-opts').innerHTML=c.options.map((o,i)=>`<div class="opt" style="background:var(--c${i})"><span class="sym">${LET[i]}</span><span>${esc(o)}${c.correct.includes(i)?' ✓':''}</span></div>`).join('');
+  if(c.correct.length>1)$('p-sec').textContent+=' · mehrere richtig';
   $('p-prev').disabled=pv.i===0;$('p-next').disabled=pv.i===pv.list.length-1}
 function preview(z,back){const r=ready(z);if(r.error){(back==='home'?$('h-err'):$('e-err')).textContent=r.error;return}
   pv={list:r.list,i:0,back};drawPre();show('v-pre');scrollTo(0,0)}
@@ -248,7 +251,7 @@ function hostInit(){
   $('e-prev').onclick=()=>{grab();preview(ed,'edit')};
   $('e-qs').oninput=e=>{const c=e.target.closest('.qcard');if(!c)return;const q=ed.qs[+c.dataset.q],t=e.target;
     if(t.classList.contains('qt'))q.text=t.value;else if(t.classList.contains('ot'))q.options[+t.dataset.k]=t.value;else if(t.classList.contains('sec'))q.seconds=t.value};
-  $('e-qs').onchange=e=>{const c=e.target.closest('.qcard');if(c&&e.target.type==='radio')ed.qs[+c.dataset.q].correct=+e.target.dataset.k};
+  $('e-qs').onchange=e=>{const c=e.target.closest('.qcard');if(c&&e.target.type==='checkbox'){const q=ed.qs[+c.dataset.q],k=+e.target.dataset.k,s=new Set([].concat(q.correct));e.target.checked?s.add(k):s.delete(k);q.correct=[...s].sort()}};
   $('e-qs').onclick=e=>{const b=e.target.closest('button');if(!b)return;grab();const i=+b.closest('.qcard').dataset.q;
     if(b.dataset.a==='delq'){ed.qs.splice(i,1);if(!ed.qs.length)ed.qs.push(blank())}else if(b.dataset.a==='addo')ed.qs[i].options.push('');drawEd()};
   $('e-csv').onclick=()=>$('e-csvf').click();
@@ -303,7 +306,7 @@ function startClock(q){
 function render(v){
   const sameQ=cur&&cur.phase==='question'&&v.phase==='question'&&cur.q.idx===v.q.idx;
   cur=v;
-  if(v.phase!=='question')clearInterval(tick);
+  if(v.phase!=='question'){clearInterval(tick);$('q-send').classList.add('hidden')}
   setTopInfo(v.phase==='lobby'&&IS_HOST?'':('PIN '+v.pin));
   if(v.phase==='lobby'){
     if(IS_HOST){show('v-lobby');$('l-pin').textContent=v.pin;
@@ -316,7 +319,7 @@ function render(v){
   }
   else if(v.phase==='question'){
     show('v-q');$('q-timer').classList.remove('hidden');
-    $('q-no').textContent=`Frage ${v.q.idx+1} von ${v.q.total}`;
+    $('q-no').textContent=`Frage ${v.q.idx+1} von ${v.q.total}`+(v.q.multi?' · Mehrere Antworten sind richtig':'');
     $('q-text').textContent=v.q.text;
     $('q-host').classList.toggle('hidden',!IS_HOST);
     if(IS_HOST)$('q-ans').textContent=`${v.answered} von ${v.n} haben geantwortet`;
@@ -326,26 +329,31 @@ function render(v){
     if(!sameQ||IS_HOST&&false){
       $('q-opts').className='opts'+(IS_HOST?' static':'');
       $('q-opts').innerHTML=v.q.options.map((o,i)=>`<button class="opt" data-i="${i}" style="background:var(--c${i})"><span class="sym">${LET[i]}</span><span>${esc(o)}</span></button>`).join('');
-      if(!IS_HOST)$('q-opts').querySelectorAll('.opt').forEach(b=>b.onclick=()=>S.emit('player:answer',+b.dataset.i));
+      sel=new Set();$('q-send').disabled=true;
+      if(!IS_HOST)$('q-opts').querySelectorAll('.opt').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;
+        if(!v.q.multi){S.emit('player:answer',i);return}
+        sel.has(i)?sel.delete(i):sel.add(i);b.classList.toggle('sel',sel.has(i));$('q-send').disabled=!sel.size});
+      $('q-send').onclick=()=>S.emit('player:answer',[...sel]);
       startClock(v.q);
     }
     if(!IS_HOST)$('q-opts').classList.toggle('hidden',answered);
+    $('q-send').classList.toggle('hidden',IS_HOST||!v.q.multi||answered);
   }
   else if(v.phase==='results'){
     show('v-res');const r=v.res;
     $('r-no').textContent=`Frage ${v.q.idx+1} von ${v.q.total}`;$('r-text').textContent=v.q.text;
-    const tot=r.counts.reduce((a,b)=>a+b,0);
+    const tot=v.answered;
     const max=Math.max(1,...r.counts);
-    $('r-bars').innerHTML=r.counts.map((c,i)=>`<div class="bar ${i===r.correct?'right':'dim'}"><div class="v">${c}${tot?` <small style="font-size:13px;color:var(--ink2)">(${Math.round(c/tot*100)}%)</small>`:''}</div><div class="col" data-h="${c/max*100}" style="height:0;background:var(--c${i})"></div><div class="lab">${LET[i]} ${esc(v.q.options[i])}${i===r.correct?' ✓':''}</div></div>`).join('');
+    $('r-bars').innerHTML=r.counts.map((c,i)=>`<div class="bar ${r.correct.includes(i)?'right':'dim'}"><div class="v">${c}${tot?` <small style="font-size:13px;color:var(--ink2)">(${Math.round(c/tot*100)}%)</small>`:''}</div><div class="col" data-h="${c/max*100}" style="height:0;background:var(--c${i})"></div><div class="lab">${LET[i]} ${esc(v.q.options[i])}${r.correct.includes(i)?' ✓':''}</div></div>`).join('');
     requestAnimationFrame(()=>requestAnimationFrame(()=>document.querySelectorAll('#r-bars .col').forEach(c=>c.style.height=Math.max(2,c.dataset.h)+'%')));
     $('r-board').innerHTML=v.board.map((b,i)=>`<li><span data-r="${i+1}.">${esc(b.name)}</span><span>${b.score}</span></li>`).join('');
-    const right=r.counts[r.correct];
-    $('r-sum').textContent=tot?`${right} von ${tot} (${Math.round(right/tot*100)} %) waren richtig.`:'Niemand hat geantwortet.';
+    const right=r.exact;
+    $('r-sum').textContent=tot?`${right} von ${tot} (${Math.round(right/tot*100)} %) haben vollständig richtig geantwortet.`:'Niemand hat geantwortet.';
     $('r-next').textContent=r.last?'Endergebnis zeigen':'Nächste Frage';
     $('r-host-card').classList.toggle('hidden',!IS_HOST);
     const me=$('r-me');me.classList.toggle('hidden',IS_HOST);
-    if(!IS_HOST){const m=v.me,ok=m.chosen===r.correct;
-      me.innerHTML=`<div class="fb ${m.chosen===null?'none':ok?'ok':'bad'}"><div class="ico">${m.chosen===null?'⏱':ok?'✓':'✗'}</div><div class="t">${m.chosen===null?'Zeit abgelaufen':ok?'Richtig!':'Leider falsch'}</div><div>${ok?`+${m.gain} Punkte · `:''}Platz ${m.rank} von ${m.of} · ${m.score} Punkte</div></div>`;
+    if(!IS_HOST){const m=v.me,ok=m.chosen!==null&&m.chosen.length===r.correct.length&&m.chosen.every(x=>r.correct.includes(x));
+      me.innerHTML=`<div class="fb ${m.chosen===null?'none':ok?'ok':'bad'}"><div class="ico">${m.chosen===null?'⏱':ok?'✓':'✗'}</div><div class="t">${m.chosen===null?'Zeit abgelaufen':ok?'Richtig!':'Leider falsch'}</div><div>${ok?`+${m.gain} Punkte · `:`Richtig: ${r.correct.map(i=>LET[i]).join(', ')} · `}Platz ${m.rank} von ${m.of} · ${m.score} Punkte</div></div>`;
       $('r-stats').classList.add('hidden');
       $('r-pl').classList.remove('hidden');$('r-pl').innerHTML=`<p class="hint center" style="margin-top:20px">Die Auswertung sehen Sie auf der Leinwand.</p>`}
   }
