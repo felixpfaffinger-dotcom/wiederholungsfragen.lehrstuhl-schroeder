@@ -98,6 +98,21 @@ io.on('connection', s => {
     }
   });
 
+  s.on('host:auth', ({ password } = {}, cb) => {
+    const pw = process.env.LEHRER_PASSWORT;
+    if (typeof cb === 'function') cb({ ok: !pw || password === pw });
+  });
+
+  s.on('host:kick', name => {
+    const r = hostRoom(); if (!r) return;
+    const e = Object.entries(r.players).find(([, p]) => p.name === name);
+    if (!e) return;
+    (r.bannedNames = r.bannedNames || new Set()).add(name.toLowerCase());
+    if (e[1].sid) io.to(e[1].sid).emit('kicked');
+    delete r.players[e[0]];
+    io.to(r.hostSid).emit('state', view(r));
+  });
+
   s.on('host:close', cb => {
     const r = hostRoom();
     if (r) { clearTimeout(r.timer); players(r).forEach(p => p.sid && io.to(p.sid).emit('closed')); delete rooms[r.pin]; }
@@ -112,6 +127,7 @@ io.on('connection', s => {
     let p = r.players[token];
     if (!p) {
       name = String(name || '').trim().slice(0, 20);
+      if (r.bannedNames && r.bannedNames.has(name.toLowerCase())) return cb({ error: 'Dieser Name wurde vom Dozenten gesperrt.' });
       if (!name) return cb({ error: 'Bitte geben Sie einen Namen ein.' });
       if (players(r).some(x => x.name.toLowerCase() === name.toLowerCase()))
         return cb({ error: 'Dieser Name ist schon vergeben.' });
