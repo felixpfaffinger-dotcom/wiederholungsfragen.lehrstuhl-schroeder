@@ -142,7 +142,7 @@ a{color:var(--c0)}.hidden{display:none!important}.center{text-align:center}
     <div class="pin" id="l-pin"></div>
     <div class="chips" id="l-names"></div>
     <p class="hint" id="l-n" style="margin-top:14px"></p>
-    <button class="btn bolt big" id="l-go" style="margin-top:12px">Quiz starten</button>
+    <div class="row" style="margin-top:14px;justify-content:center"><button class="btn bolt big" id="l-go">Quiz starten</button><button class="btn ghost big" id="l-close">Quiz beenden</button></div>
   </section>
 
   <!-- Frage (Lehrer + Schüler) -->
@@ -179,7 +179,8 @@ a{color:var(--c0)}.hidden{display:none!important}.center{text-align:center}
   <section id="v-end" class="hidden">
     <h1>Ergebnis</h1>
     <div id="e-me" class="hidden"></div>
-    <div class="card"><h3>Endergebnis</h3><ol class="board" id="e-board"></ol></div>
+    <div class="card"><h3>Rangliste der besten Teilnehmer</h3><ol class="board" id="e-board"></ol></div>
+    <p class="hint" id="e-count" style="margin-top:12px"></p>
     <div class="row" style="margin-top:18px"><button class="btn ghost" id="e-new">Zurück zur Übersicht</button></div>
   </section>
 </div>
@@ -191,8 +192,12 @@ const LET='ABCDEF';
 const IS_HOST=location.pathname.replace(/\/$/,'')==='/host';
 const S=io(), store=k=>localStorage.getItem(k), put=(k,v)=>localStorage.setItem(k,v);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-let tick=null, cur=null, parsed=[], sel=new Set();
+let endT=null, tick=null, cur=null, parsed=[], sel=new Set();
 
+function leave(){if(IS_HOST){localStorage.removeItem('kb-host');location.reload()}else{localStorage.removeItem('kb-pin');localStorage.removeItem('kb-token');location.href='/'}}
+function endCountdown(){if(endT)return;let n=30;const upd=()=>{$('e-count').textContent=IS_HOST?`Diese Ansicht schließt sich in ${n} Sekunden. Danach kehren Sie zur Quiz-Übersicht zurück.`:`Diese Ansicht schließt sich in ${n} Sekunden. Für ein weiteres Quiz geben Sie danach einen neuen PIN ein.`};
+  upd();endT=setInterval(()=>{n--;if(n<=0){clearInterval(endT);endT=null;leave()}else upd()},1000)}
+S.on('closed',()=>{sessionStorage.setItem('kb-msg','Das Quiz wurde vom Dozenten beendet.');leave()});
 function show(id){['v-join','v-home','v-edit','v-pre','v-lobby','v-q','v-res','v-end'].forEach(v=>$(v).classList.toggle('hidden',v!==id))}
 function setTopInfo(txt){const t=$('topinfo');t.classList.toggle('hidden',!txt);t.textContent=txt||''}
 
@@ -264,9 +269,10 @@ function hostInit(){
   $('p-prev').onclick=()=>{pv.i--;drawPre()};$('p-next').onclick=()=>{pv.i++;drawPre()};
   $('p-close').onclick=()=>pv.back==='home'?home():show('v-edit');
   $('l-go').onclick=()=>S.emit('host:next');
+  $('l-close').onclick=()=>{if(confirm('Quiz beenden? Alle Teilnehmer kehren zur Startseite zurück.'))S.emit('host:close',()=>leave())};
   $('q-end').onclick=()=>S.emit('host:end');
   $('r-next').onclick=()=>S.emit('host:next');
-  $('e-new').onclick=()=>{localStorage.removeItem('kb-host');location.reload()};
+  $('e-new').onclick=leave;
   $('l-url').textContent=location.host;
 }
 
@@ -283,8 +289,9 @@ function playerInit(){
       put('kb-pin',pin);put('kb-name',res.name);render(res.view)})};
   $('j-go').onclick=go;
   [$('j-pin'),$('j-name')].forEach(i=>i.onkeydown=e=>{if(e.key==='Enter')go()});
-  $('e-new').onclick=()=>location.reload();
-  $('e-new').textContent='Erneut beitreten';
+  $('e-new').onclick=leave;
+  $('e-new').textContent='Zur Startseite';
+  const m=sessionStorage.getItem('kb-msg');if(m){$('j-err').textContent=m;sessionStorage.removeItem('kb-msg')}
 }
 
 S.on('connect',()=>{
@@ -308,6 +315,7 @@ function startClock(q){
 function render(v){
   const sameQ=cur&&cur.phase==='question'&&v.phase==='question'&&cur.q.idx===v.q.idx;
   cur=v;
+  if(v.phase!=='end'&&endT){clearInterval(endT);endT=null}
   if(v.phase!=='question'){clearInterval(tick);$('q-send').classList.add('hidden')}
   setTopInfo(v.phase==='lobby'&&IS_HOST?'':('PIN '+v.pin));
   if(v.phase==='lobby'){
@@ -360,7 +368,7 @@ function render(v){
       $('r-pl').classList.remove('hidden');$('r-pl').innerHTML=`<p class="hint center" style="margin-top:20px">Die Auswertung sehen Sie auf der Leinwand.</p>`}
   }
   else if(v.phase==='end'){
-    show('v-end');
+    show('v-end');endCountdown();
     $('e-board').innerHTML=v.board.map((b,i)=>`<li><span data-r="${i+1}.">${esc(b.name)}</span><span>${b.score}</span></li>`).join('');
     const me=$('e-me');me.classList.toggle('hidden',IS_HOST);
     if(!IS_HOST)me.innerHTML=`<div class="fb ok" style="margin-bottom:18px"><div class="t">Platz ${v.me.rank} von ${v.me.of}</div><div>${v.me.score} Punkte</div></div>`;
