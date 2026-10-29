@@ -189,7 +189,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 let tick=null, cur=null, parsed=[];
 
 function show(id){['v-join','v-setup','v-lobby','v-q','v-res','v-end'].forEach(v=>$(v).classList.toggle('hidden',v!==id))}
-function top(txt){const t=$('topinfo');t.classList.toggle('hidden',!txt);t.textContent=txt||''}
+function setTopInfo(txt){const t=$('topinfo');t.classList.toggle('hidden',!txt);t.textContent=txt||''}
 
 /* ---------- CSV ---------- */
 function parseQuestions(raw,defT){
@@ -269,7 +269,7 @@ function render(v){
   const sameQ=cur&&cur.phase==='question'&&v.phase==='question'&&cur.q.idx===v.q.idx;
   cur=v;
   if(v.phase!=='question')clearInterval(tick);
-  top(v.phase==='lobby'&&IS_HOST?'':('PIN '+v.pin));
+  setTopInfo(v.phase==='lobby'&&IS_HOST?'':('PIN '+v.pin));
   if(v.phase==='lobby'){
     if(IS_HOST){show('v-lobby');$('l-pin').textContent=v.pin;
       $('l-names').innerHTML=v.names.map(n=>`<span class="chip">${esc(n)}</span>`).join('');
@@ -288,7 +288,7 @@ function render(v){
     const answered=!IS_HOST&&v.me.chosen!==null;
     $('q-wait').classList.toggle('hidden',!answered);
     if(answered)$('q-wait').innerHTML='<span class="pulse">⚡</span><h2>Antwort gespeichert</h2><p class="hint">Warte, bis alle fertig sind …</p>';
-    if(!sameQ||IS_HOST&&false){
+    if(!sameQ){
       $('q-opts').className='opts'+(IS_HOST?' static':'');
       $('q-opts').innerHTML=v.q.options.map((o,i)=>`<button class="opt" data-i="${i}" style="background:var(--c${i})"><span class="sym">${SYM[i]}</span><span>${esc(o)}</span></button>`).join('');
       if(!IS_HOST)$('q-opts').querySelectorAll('.opt').forEach(b=>b.onclick=()=>S.emit('player:answer',+b.dataset.i));
@@ -319,7 +319,6 @@ function render(v){
     $('e-board').innerHTML=v.board.map((b,i)=>`<li><span data-r="${i+1}.">${esc(b.name)}</span><span>${b.score}</span></li>`).join('');
     const me=$('e-me');me.classList.toggle('hidden',IS_HOST);
     if(!IS_HOST)me.innerHTML=`<div class="fb ok" style="margin-bottom:18px"><div class="t">Platz ${v.me.rank} von ${v.me.of}</div><div>${v.me.score} Punkte</div></div>`;
-    $('e-new').classList.toggle('hidden',!IS_HOST&&false);
   }
   if(v.phase!=='results'&&!IS_HOST){$('r-stats').classList.remove('hidden');$('r-pl').classList.add('hidden')}
 }
