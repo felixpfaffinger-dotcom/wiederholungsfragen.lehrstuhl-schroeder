@@ -63,7 +63,7 @@ function finish(r) {
   players(r).forEach(p => {
     p.gain = 0;
     if (p.ans && same(p.ans.c, q.correct)) {
-      p.gain = Math.round(500 + 500 * Math.max(0, 1 - p.ans.t / (q.seconds * 1000)));
+      p.gain = Math.round(800 + 200 * Math.max(0, 1 - p.ans.t / (q.seconds * 1000)));
       p.score += p.gain;
     }
   });
@@ -94,19 +94,25 @@ io.on('connection', s => {
     const r = hostRoom(); if (!r) return;
     if (r.phase === 'lobby' || r.phase === 'results') {
       if (r.idx + 1 < r.questions.length) start(r);
-      else { r.phase = 'end'; broadcast(r); }
+      else { r.phase = 'end'; broadcast(r); setTimeout(() => { delete rooms[r.pin]; }, 90000); }
     }
+  });
+
+  s.on('host:close', cb => {
+    const r = hostRoom();
+    if (r) { clearTimeout(r.timer); players(r).forEach(p => p.sid && io.to(p.sid).emit('closed')); delete rooms[r.pin]; }
+    if (typeof cb === 'function') cb();
   });
 
   s.on('host:end', () => { const r = hostRoom(); if (r) finish(r); });
 
   s.on('player:join', ({ pin, name, token }, cb) => {
     const r = rooms[String(pin || '').trim()];
-    if (!r) return cb({ error: 'Diese PIN gibt es nicht. Prüfe die Zahl auf dem Beamer.' });
+    if (!r) return cb({ error: 'Diese PIN gibt es nicht. Bitte prüfen Sie die Zahl auf der Leinwand.' });
     let p = r.players[token];
     if (!p) {
       name = String(name || '').trim().slice(0, 20);
-      if (!name) return cb({ error: 'Bitte gib einen Namen ein.' });
+      if (!name) return cb({ error: 'Bitte geben Sie einen Namen ein.' });
       if (players(r).some(x => x.name.toLowerCase() === name.toLowerCase()))
         return cb({ error: 'Dieser Name ist schon vergeben.' });
       p = r.players[token] = { name, score: 0, gain: 0, ans: null };
